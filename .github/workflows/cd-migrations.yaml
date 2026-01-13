@@ -1,0 +1,36 @@
+name: CD Migrations
+
+on:
+  push:
+    tags:
+      - "migrations-v*"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build migrations image
+        run: |
+          docker build \
+            -f migrations/Dockerfile \
+            -t ghcr.io/alexlup06-authgate/authgate-migrations:${{ github.ref_name }} \
+            ./migrations
+
+      - name: Push migrations image
+        run: |
+          docker push ghcr.io/alexlup06-authgate/authgate-migrations:${{ github.ref_name }}

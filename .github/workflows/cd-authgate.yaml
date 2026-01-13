@@ -1,0 +1,38 @@
+name: CD
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: |
+          docker build \
+            -f docker/Dockerfile.prod \
+            -t ghcr.io/alexlup06-authgate/authgate-core:${{ github.ref_name }} \
+            .
+
+      - name: Push image
+        run: |
+          docker push ghcr.io/alexlup06-authgate/authgate-core:${{ github.ref_name }}
+

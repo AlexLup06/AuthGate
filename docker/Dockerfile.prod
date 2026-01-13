@@ -1,0 +1,51 @@
+# ---------- Frontend Builder ----------
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./frontend/
+RUN cd frontend && npm ci
+
+COPY frontend ./frontend
+COPY internal/http/templates ./internal/http/templates
+
+RUN cd frontend && npm run build
+
+# ---------- Backend Builder ----------
+FROM golang:1.25-alpine AS backend-builder
+
+WORKDIR /app
+
+RUN apk add --no-cache git
+
+# Install templ
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.977
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+# Generate templ files
+RUN templ generate
+
+# Copy frontend assets into server static dir
+COPY --from=frontend-builder /frontend/dist ./internal/http/static
+
+# Build binary
+RUN go build -o /bin/authgate ./cmd/authgate
+
+# ---------- Runtime ----------
+FROM alpine
+
+RUN apk add --no-cache ca-certificates
+RUN adduser -D -g '' authgate
+
+USER authgate
+WORKDIR /home/authgate
+
+COPY --from=backend-builder /bin/authgate ./authgate
+
+EXPOSE 8080
+
+ENTRYPOINT ["./authgate"]

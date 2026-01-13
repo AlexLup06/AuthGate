@@ -1,0 +1,61 @@
+services:
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /frontend
+    volumes:
+      - ./frontend:/frontend
+    command: npm run dev:webpack
+
+
+  postgres:
+    image: postgres:16.2
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    healthcheck:
+      test: "/usr/bin/pg_isready --dbname=${POSTGRESQL_DATABASE} --username=${POSTGRESQL_USERNAME} || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backend-migrations:
+    build:
+      context: ./migrations
+    environment:
+      POSTGRESQL_HOST: ${POSTGRESQL_HOST}
+      POSTGRESQL_PORT: ${POSTGRESQL_PORT}
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    command: ["up", "-env=development", "-config=./dbconfig.yaml"]
+    restart: "no"
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - ./internal/http/static:/static
+      - ./frontend/dist/app.js:/static/app.js
+    env_file:
+        - .env
+    depends_on:
+      backend-migrations:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
+

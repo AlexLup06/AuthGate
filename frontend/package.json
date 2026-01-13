@@ -1,0 +1,22 @@
+{
+  "name": "authgate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:webpack": "webpack --mode development --watch",
+    "dev:tailwind": "tailwindcss -i ./src/styles/style.css -o ./dist/app.css --watch",
+    "build": "npm run build:webpack && npm run build:tailwind",
+    "build:webpack": "rm -rf dist && webpack --mode production",
+    "build:tailwind": "tailwindcss -i ./src/styles/style.css -o ./dist/app.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^4.1.18",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
