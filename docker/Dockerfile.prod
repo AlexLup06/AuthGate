@@ -30,7 +30,7 @@ COPY . .
 RUN templ generate
 
 # Copy frontend assets into server static dir
-COPY --from=frontend-builder /frontend/dist ./internal/http/static
+COPY --from=frontend-builder /app/frontend/dist ./internal/http/static
 
 # Build binary
 RUN go build -o /bin/authgate ./cmd/authgate
