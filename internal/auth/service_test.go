@@ -19,7 +19,7 @@ func setupAuthService(t *testing.T) (*Service, context.Context) {
 		Port:     5432,
 		Username: "authgate",
 		Password: "authgate",
-		Database: "authgate",
+		Database: "authgate_test",
 		Schema:   "public",
 		Timezone: "UTC",
 		LogSql:   false,
