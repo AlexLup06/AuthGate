@@ -76,7 +76,10 @@ jobs:
             -e POSTGRESQL_DATABASE \
             -e POSTGRESQL_USERNAME \
             -e POSTGRESQL_PASSWORD \
-            authgate-migrations:test up
+            authgate-migrations:test \
+            up \
+            -env=default \
+            -config=./dbconfig.yaml
 
       # ------------------------------------------------------------
       # Run Go tests

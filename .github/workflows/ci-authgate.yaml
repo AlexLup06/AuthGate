@@ -49,7 +49,7 @@ jobs:
       # templ generate
       # ------------------------------------------------------------
       - name: Install templ
-        run: go install github.com/a-h/templ/cmd/templ@v0.3.819
+        run: go install github.com/a-h/templ/cmd/templ@v0.3.977
 
       - name: Generate templ files
         run: |
@@ -61,7 +61,7 @@ jobs:
       # ------------------------------------------------------------
       - name: Build Tailwind CSS
         working-directory: frontend
-        run: npm run build:css
+        run: npm run build:tailwind
 
       # ------------------------------------------------------------
       # TypeScript + Webpack

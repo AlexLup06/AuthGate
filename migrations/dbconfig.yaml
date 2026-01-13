@@ -1,4 +1,4 @@
-development:
+default:
   dialect: postgres
   datasource: host=${POSTGRESQL_HOST} port=${POSTGRESQL_PORT} dbname=${POSTGRESQL_DATABASE} user=${POSTGRESQL_USERNAME} password=${POSTGRESQL_PASSWORD} sslmode=disable
   schema: public
